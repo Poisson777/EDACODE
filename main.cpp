@@ -16,7 +16,11 @@ int main() {
 
     //读入数据获取的Graph
     Graph* graph;
-    vector<FPGA*> fpgas = graph->FPGAs;
+    vector<FPGA*> fpgas;
+    for(auto fpga:graph->FPGAs){
+        fpgas.push_back(fpga.second);
+    }
+
     RoutingGraph* routinggraph;
 
     // getTDMNets
@@ -88,7 +92,7 @@ int main() {
     // 这里省略SLL的赋值
     // Troncon的赋值from to net  Xdrvar赋值 from to Id forward
     // 删除没有用的Troncon
-    vector<vector<Troncon*>> troncons=routinggraph->troncons;
+    vector<vector<Troncon*>> troncons=routinggraph->troncon_array;
     vector<Troncon*> tronconNetUsed = routinggraph->tronconsNetUsed;
     vector<XdrVar*> optXdrvars = routinggraph->optXdrVars;
     int index = 0;

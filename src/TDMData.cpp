@@ -127,22 +127,23 @@ public :
             fpga->FPGAId = fpga_id;
             for(auto die_id:pair.second){
                 Die* die = Dies[die_id];
+                die->fpga = fpga;
                 fpga->Dies.push_back(die);
             }
             FPGAs.insert(make_pair(fpga_id,fpga));
         }
     }
     void toString(){
-        for(auto pair:FPGAs){
-            cout<<"FPGAID"<<pair.first<<endl;
-            for(auto die:pair.second->Dies){
-                cout<<"DieID"<<die->DieId<<endl;
-                for(auto node:die->Nodes){
-                    cout<<" Node"<<node->NodeId;
-                }
-                cout<<endl;
-            }
-        }
+//        for(auto pair:FPGAs){
+//            cout<<"FPGAID"<<pair.first<<endl;
+//            for(auto die:pair.second->Dies){
+//                cout<<"DieID"<<die->DieId<<endl;
+//                for(auto node:die->Nodes){
+//                    cout<<" Node"<<node->NodeId;
+//                }
+//                cout<<endl;
+//            }
+//        }
     }
 };
 
@@ -150,7 +151,6 @@ class RoutingGraph{
 public:
     Graph* graph;
     vector<Net*> nets;
-
     vector<TDMNet*> tdmNets;
     Node* sourceNode;
     Node* sinkNode;
@@ -162,14 +162,15 @@ public:
     vector<Edge*> edges;
     vector<vector<Node*>>levels;
     vector<vector<Node*>> revlevels;
-    vector<vector<Troncon*>> troncons;
+    vector<vector<Troncon*>> troncon_array;
     vector<Troncon*> tronconsNetUsed;
     vector< XdrVar*> optXdrVars;
     vector<XdrVar*> xdrvars;
     vector<bool> isoptXdrvar;
     int InterationCount=0;
     double maxChoice;
-    void initRoutingGraph(Graph* g,vector<pair<int,vector<int>>> source_sink,vector<vector<int>> wires){
+    void initRoutingGraph(Graph* g,vector<pair<int,vector<int>>> source_sink,
+                          vector<vector<int>> wires){
         this->graph = g;
         for(auto pair:source_sink){
             Net* net = new Net();
@@ -181,13 +182,41 @@ public:
             }
             nets.push_back(net);
         }
+        for(int i=0;i<wires.size();i++){
+            vector<Troncon*> trs;
+            for(int j=i;j<wires.size();j++) {
+                if (wires[i][j] != 0) {
+                    auto *tr = new Troncon();
+                    tr->TronconId = 0;
+                    tr->limit = wires[i][j];
+                    tr->TwoDie =
+                            make_pair(graph->Dies[i], graph->Dies[j]);
+                    trs.push_back(tr);
+                }
+            }
+            if(!trs.empty()) {
+                for(auto tr:trs){
+                    tronconsNetUsed.push_back(tr);
+                }
+            }
+            troncon_array.push_back(trs);
+        }
     }
     void net_toString(){
+        cout<<"------------------Nets---------------"<<endl;
         for(auto net:nets){
             cout<<net->NetId<<endl;
-            cout<<"SourceNode"<<net->sourceNode->NodeId<<"Die"<<net->sourceNode->die->DieId<<endl;
+            cout<<"SourceNode"<<net->sourceNode->NodeId<<" Die"<<net->sourceNode->die->DieId<<endl;
             for(auto sinkNode1:net->sinkNodes){
-                cout<<"SinkNode"<<sinkNode1->NodeId<<"Die"<<sinkNode1->die->DieId<<endl;
+                cout<<"SinkNode"<<sinkNode1->NodeId<<" Die"<<sinkNode1->die->DieId<<endl;
+            }
+        }
+        cout<<"--------------------SLL---------------"<<endl;
+        for(auto troncons:troncon_array){
+            for(auto troncon:troncons){
+                cout<<troncon->limit;
+                cout<< "Die"<<troncon->TwoDie.first->DieId;
+                cout<< "Die"<<troncon->TwoDie.second->DieId<<endl;
             }
         }
     }

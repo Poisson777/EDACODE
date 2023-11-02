@@ -253,41 +253,59 @@ public:
             cout << "无法映射文件到内存: " << strerror(errno) << endl;
             return false;
         }
-        int index = 0;
+        int limit = 0;
         vector<int> ve;
         for (int i = 0; i < fileLength; i++) {
             if(buffer[i]>='0'&&buffer[i]<='9'){
-                index =index*10+buffer[i]-'0';
+                limit = limit * 10 + buffer[i] - '0';
             }
-            else if(buffer[i]==' '){
-                ve.push_back(index);
-                index = 0;
-            }
-            else if(buffer[i]=='\n'&&ve.size()>0){
-                ve.push_back(index);
-                index = 0;
+            else if(buffer[i]=='\n'&&!ve.empty()){
+                ve.push_back(limit);
                 wires.push_back(ve);
+                limit = 0;
                 ve.clear();
+            }
+            else if(buffer[i]=='\n'&&ve.empty()){
+
+            }
+            else if(buffer[i]=='\t'||buffer[i]==' '){
+                ve.push_back(limit);
+                limit = 0;
             }
         }
 
         munmap(buffer, fileLength);
+        string str;
         int row=0;
         int column = 0;
         for(auto line:wires){
             column = 0;
             for (int a:line) {
-//                cout<<"(";
-//                cout<<row ;
-//                cout<<",";
-//                cout<<column;
-//                cout<<")";
+                cout<<"(";
+                cout<<row ;
+                cout<<",";
+                cout<<column;
+                cout<<")";
                 cout<< a << " ";
+                str += to_string(a)+" ";
                 column++;
             }
+            str+="\n";
             cout<<endl;
             row++;
         }
+        outputFile(str);
         return true;
+    }
+    bool outputFile(string data){
+        const std::string outputPath = "TestCase20231027/output/output.txt";
+        std::ofstream file(outputPath);
+        if (!file.is_open()) {
+            std::cerr << "无法打开文件 " << outputPath << std::endl;
+            return 1;
+        }
+        file << data; // 使用 std::string 直接写入
+        file.close();
+        return 0;
     }
 };
