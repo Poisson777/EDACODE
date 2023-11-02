@@ -100,15 +100,60 @@ public :
     Node* sourceNode;
     int driverPinId;
     XdrVar* xdrvar;
-
 };
+class Graph{
+public :
+    map<int,FPGA*> FPGAs;
+    map<int,Die*> Dies;
+    map<int,Node*> Nodes;
+    void constructGraph(const map<int,vector<int>>& die_position,
+                        const map<int,vector<int>>& fpga_die){
+        for(const auto& pair:die_position){
+            int die_id = pair.first;
+            Die* die = new Die();
+            die->DieId = die_id;
+            for(auto node_id:pair.second){
+                Node *node = new Node();
+                node->NodeId = node_id;
+                node->die = die;
+                Nodes.insert(make_pair(node_id,node));
+                die->Nodes.push_back(node);
+            }
+            Dies.insert(make_pair(die_id,die));
+        }
+        for(const auto& pair:fpga_die){
+            int fpga_id = pair.first;
+            FPGA* fpga = new FPGA();
+            fpga->FPGAId = fpga_id;
+            for(auto die_id:pair.second){
+                Die* die = Dies[die_id];
+                fpga->Dies.push_back(die);
+            }
+            FPGAs.insert(make_pair(fpga_id,fpga));
+        }
+    }
+    void toString(){
+        for(auto pair:FPGAs){
+            cout<<"FPGAID"<<pair.first<<endl;
+            for(auto die:pair.second->Dies){
+                cout<<"DieID"<<die->DieId<<endl;
+                for(auto node:die->Nodes){
+                    cout<<" Node"<<node->NodeId;
+                }
+                cout<<endl;
+            }
+        }
+    }
+};
+
 class RoutingGraph{
 public:
-    Node* sourceNode;
-    Node* sinkNode;
     Graph* graph;
     vector<Net*> nets;
+
     vector<TDMNet*> tdmNets;
+    Node* sourceNode;
+    Node* sinkNode;
     vector<set<Die*>> netDies;
     vector<set<FPGA*>> netFPGAs;
     vector<double> mu;
@@ -124,7 +169,28 @@ public:
     vector<bool> isoptXdrvar;
     int InterationCount=0;
     double maxChoice;
-
+    void initRoutingGraph(Graph* g,vector<pair<int,vector<int>>> source_sink,vector<vector<int>> wires){
+        this->graph = g;
+        for(auto pair:source_sink){
+            Net* net = new Net();
+            net->NetId = nets.size();
+            net->sourceNode = graph->Nodes[pair.first];
+            for(auto sink_node_id:pair.second){
+                Node* sink_node = graph->Nodes[sink_node_id];
+                net->sinkNodes.push_back(sink_node);
+            }
+            nets.push_back(net);
+        }
+    }
+    void net_toString(){
+        for(auto net:nets){
+            cout<<net->NetId<<endl;
+            cout<<"SourceNode"<<net->sourceNode->NodeId<<"Die"<<net->sourceNode->die->DieId<<endl;
+            for(auto sinkNode1:net->sinkNodes){
+                cout<<"SinkNode"<<sinkNode1->NodeId<<"Die"<<sinkNode1->die->DieId<<endl;
+            }
+        }
+    }
     void updateTime(){
         //updateArrivalTime
         //resetArrivaltime
@@ -182,47 +248,6 @@ public:
 //                    edge->driverNode->updateRequireTime(requireTime-delay)
                     edge->driverNode->requireTime=min(edge->driverNode->requireTime,edge->driverNode->requireTime-edge->delay);
                 }
-            }
-        }
-    }
-};
-class Graph{
-public :
-    map<int,FPGA*> FPGAs;
-    map<int,Die*> Dies;
-    void constructGraph(const map<int,vector<int>>& die_position,
-                        const map<int,vector<int>>& fpga_die){
-        for(const auto& pair:die_position){
-            int die_id = pair.first;
-            Die* die = new Die();
-            die->DieId = die_id;
-            for(auto node_id:pair.second){
-                Node *node = new Node();
-                node->NodeId = node_id;
-                die->Nodes.push_back(node);
-            }
-            Dies.insert(make_pair(die_id,die));
-        }
-        for(const auto& pair:fpga_die){
-            int fpga_id = pair.first;
-            FPGA* fpga = new FPGA();
-            fpga->FPGAId = fpga_id;
-            for(auto die_id:pair.second){
-                Die* die = Dies[die_id];
-                fpga->Dies.push_back(die);
-            }
-            FPGAs.insert(make_pair(fpga_id,fpga));
-        }
-    }
-    void toString(){
-        for(auto pair:FPGAs){
-            cout<<"FPGAID"<<pair.first<<endl;
-            for(auto die:pair.second->Dies){
-                cout<<"DieID"<<die->DieId<<endl;
-                for(auto node:die->Nodes){
-                    cout<<" Node"<<node->NodeId;
-                }
-                cout<<endl;
             }
         }
     }
