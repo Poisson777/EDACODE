@@ -5,9 +5,15 @@
 #include "src/global.h"
 #include "src/TDMData.cpp"
 #include "src/TDMRefine.cpp"
+#include "src/FileManager.cpp"
 using namespace std;
 
 int main() {
+    const string testCase_num = "1";
+    FileManager fileManager;
+
+
+
     //读入数据获取的Graph
     Graph* graph;
     vector<FPGA*> fpgas = graph->FPGAs;

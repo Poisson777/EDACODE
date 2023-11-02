@@ -14,14 +14,25 @@ class XdrVar;
 
 class FPGA{
 public:
-    int FPGAId;
+    int FPGAId{};
     vector<Die*> Dies;
+
 };
 class Die{
 public:
-    int DieId;
-    FPGA* FPGA;
+    int DieId{};
+    FPGA* fpga{};
     vector<Node*> Nodes;
+
+};
+class Node{
+public:
+    int NodeId;
+    Die* die;
+    vector<Edge*> driverEdges;
+    vector<Edge*> fanoutEdges;
+    double arrivalTime;
+    double requireTime;
 };
 class Troncon{
 public :
@@ -38,15 +49,6 @@ public:
     double TDMRatio;
     Troncon* troncon;
     vector <Edge*> edges;
-};
-class Node{
-public:
-    int NodeId;
-    Die* die;
-    vector<Edge*> driverEdges;
-    vector<Edge*> fanoutEdges;
-    double arrivalTime;
-    double requireTime;
 };
 class Net{
 public:
@@ -186,7 +188,43 @@ public:
 };
 class Graph{
 public :
-    vector<FPGA*> FPGAs;
-    vector<Die*> Dies;
+    map<int,FPGA*> FPGAs;
+    map<int,Die*> Dies;
+    void constructGraph(const map<int,vector<int>>& die_position,
+                        const map<int,vector<int>>& fpga_die){
+        for(const auto& pair:die_position){
+            int die_id = pair.first;
+            Die* die = new Die();
+            die->DieId = die_id;
+            for(auto node_id:pair.second){
+                Node *node = new Node();
+                node->NodeId = node_id;
+                die->Nodes.push_back(node);
+            }
+            Dies.insert(make_pair(die_id,die));
+        }
+        for(const auto& pair:fpga_die){
+            int fpga_id = pair.first;
+            FPGA* fpga = new FPGA();
+            fpga->FPGAId = fpga_id;
+            for(auto die_id:pair.second){
+                Die* die = Dies[die_id];
+                fpga->Dies.push_back(die);
+            }
+            FPGAs.insert(make_pair(fpga_id,fpga));
+        }
+    }
+    void toString(){
+        for(auto pair:FPGAs){
+            cout<<"FPGAID"<<pair.first<<endl;
+            for(auto die:pair.second->Dies){
+                cout<<"DieID"<<die->DieId<<endl;
+                for(auto node:die->Nodes){
+                    cout<<" Node"<<node->NodeId;
+                }
+                cout<<endl;
+            }
+        }
+    }
 };
 

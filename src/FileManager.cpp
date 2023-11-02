@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include <regex>
-#include <cstring>  // 添加这行
+#include <cstring>
 //#include "TDMData.cpp"
 
 class FileManager{
@@ -16,9 +16,14 @@ public:
     map<int, vector<int>> die_position;
     map<int, vector<int>> fpga_die;
     vector<pair<int,vector<int>>> source_sink;
-    vector<vector<int>> lines;
+    vector<vector<int>> wires;
     string filename = "./TestCase20231027/testcase";
-
+    bool read(string testcase_Num){
+        return readFile(testcase_Num)&&
+        readFile1(testcase_Num)&&
+        readFile2(testcase_Num)&&
+        readFile3(testcase_Num);
+    }
     bool readFile(string testcaseNum){
         string die_node_filename = filename+ testcaseNum + "/design.die.position";
             int fd = open(die_node_filename.c_str(), O_RDONLY);
@@ -71,6 +76,8 @@ public:
                     }
                 }
             }
+        
+        munmap(buffer, fileLength);
         for(auto pair:die_position){
             cout<<pair.first<<" ";
             const std::vector<int>& positions = pair.second;
@@ -79,8 +86,6 @@ public:
             }
             cout<<endl;
         }
-        munmap(buffer, fileLength);
-
 
         return true;
     }
@@ -261,7 +266,7 @@ public:
             else if(buffer[i]=='\n'&&ve.size()>0){
                 ve.push_back(index);
                 index = 0;
-                lines.push_back(ve);
+                wires.push_back(ve);
                 ve.clear();
             }
         }
@@ -269,14 +274,14 @@ public:
         munmap(buffer, fileLength);
         int row=0;
         int column = 0;
-        for(auto line:lines){
+        for(auto line:wires){
             column = 0;
             for (int a:line) {
-                cout<<"(";
-                cout<<row ;
-                cout<<",";
-                cout<<column;
-                cout<<")";
+//                cout<<"(";
+//                cout<<row ;
+//                cout<<",";
+//                cout<<column;
+//                cout<<")";
                 cout<< a << " ";
                 column++;
             }
