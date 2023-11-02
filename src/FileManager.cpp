@@ -53,6 +53,7 @@ public:
             bool isleft = true;
             int leftIndex = 0;
             int currentId = 0;
+            vector<int> gve;
             for (int i = 0; i < fileLength; i++) {
                 if (isleft) {
                     if (buffer[i] >= '0' && buffer[i] <= '9') {
@@ -67,16 +68,19 @@ public:
                     if (buffer[i] >= '0' && buffer[i] <= '9') {
                         currentId = currentId * 10 + buffer[i] - '0';
                     } else if (buffer[i] == '\n') {
+                        die_position[leftIndex] = gve;
+                        gve.clear();
                         isleft = true;
                         currentId = 0;
                         leftIndex = 0;
                     } else if (buffer[i] == ' ') {
-                        die_position[leftIndex].push_back(currentId);
+                        gve.push_back(currentId);
+
                     } else {
                     }
                 }
             }
-        
+        die_position[leftIndex] = gve;
         munmap(buffer, fileLength);
         for(auto pair:die_position){
             cout<<pair.first<<" ";
@@ -294,7 +298,7 @@ public:
             cout<<endl;
             row++;
         }
-        outputFile(str);
+//        outputFile(str);
         return true;
     }
     bool outputFile(string data){

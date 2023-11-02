@@ -126,6 +126,7 @@ public :
             FPGA* fpga = new FPGA();
             fpga->FPGAId = fpga_id;
             for(auto die_id:pair.second){
+
                 Die* die = Dies[die_id];
                 die->fpga = fpga;
                 fpga->Dies.push_back(die);
@@ -215,8 +216,8 @@ public:
         for(auto troncons:troncon_array){
             for(auto troncon:troncons){
                 cout<<troncon->limit;
-                cout<< "Die"<<troncon->TwoDie.first->DieId;
-                cout<< "Die"<<troncon->TwoDie.second->DieId<<endl;
+                cout<< " Die"<<troncon->TwoDie.first->DieId;
+                cout<< " Die"<<troncon->TwoDie.second->DieId<<endl;
             }
         }
     }
