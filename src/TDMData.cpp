@@ -56,6 +56,7 @@ public:
     Node* sourceNode;
     vector<Node*> sinkNodes;
     vector<Edge*> edges;
+    map<Node*,vector<Edge*>> paths;
     vector<Pin*> pins;
 };
 class Pin{
