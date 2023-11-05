@@ -36,8 +36,6 @@ std::string filename_prefix() {
 }
 
 void layout() {
-    assert(sqrt(16384) == 128);
-
     std::vector<int> adj;
     get_network(filename_prefix() + "die.network").swap(adj);
     int n = sqrt(adj.size());

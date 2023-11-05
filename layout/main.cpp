@@ -1,6 +1,7 @@
 // temporary test .cpp file
 extern void layout();
+#include "head.h"
 
-main() {
+int main() {
     layout();
 }
