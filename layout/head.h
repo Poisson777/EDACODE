@@ -24,8 +24,10 @@ private:
     int new_node();
 public:
     Trie();
-    void add(std::string s, _Ty val);
-    _Ty query(std::string s);
+    void add(const std::string &s, _Ty val);
+    void add(const std::string &s, int l, int r, _Ty val); // [l,r)
+    _Ty query(const std::string &s);
+    _Ty query(const std::string &s, int l, int r); // [l,r)
 };
 #include "Trie.tpp"
 
