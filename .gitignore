@@ -1,2 +1,5 @@
+*.o
 layout/a.out
+layout/Makefile
+layout/*.o
 TestCase20230927/*
