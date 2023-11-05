@@ -7,9 +7,12 @@ int main() {
     std::cout << "sqrt() test passed.\n";
 
     Trie<int> trie;
+    
     trie.add("abc123", 1);
-    assert(trie.query("abc123" == 1));
-    assert(trie.query("abc12" == 0));
+    std::string s1 = "abc123";
+    assert(trie.query(s1) == 1);
+    s1.pop_back();
+    assert(trie.query(s1) == 0);
     std::cout << "Trie class test passed.\n";
 
     // layout();
