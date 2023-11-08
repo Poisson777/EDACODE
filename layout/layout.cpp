@@ -114,10 +114,20 @@ std::string filename_prefix() {
 void layout() {
     std::vector<int> adj;
     get_network(filename_prefix() + "die.network").swap(adj);
+    
     int n = sqrt(adj.size());
 
-    // get the weight of edge
-    std::function<int(int,int)> weight = [&](int x, int y) {
+    // get the flow of edges, read-n-write, directly modify the reference variable
+    auto flow = [&adj, &n](int x, int y) -> int& {
+        // assert(x != y);
+        if(x < y) std::swap(x, y);
+        return adj[x * n + y];
+    };
+
+    // get the weight of edges, read-only
+    auto weight = [&adj, &n](int x, int y) -> int {
+        // assert(x != y);
+        if(x > y) std::swap(x, y);
         return adj[x * n + y];
     };
 
@@ -141,7 +151,7 @@ void layout() {
 
             from[v] = fa;
 
-            for(int to = 0; to < n; ++to) if(to != v && !vis[to]) {
+            for(int to = 0; to < n; ++to) if(weight(v, to) < flow(v, to) && to != v && !vis[to]) {
                 q.emplace(to, v, dist + 1);
             }
         }
@@ -150,6 +160,7 @@ void layout() {
         for(int l : dies_l) {
             for(int fa = from[l]; fa != -1;) {
                 edges.emplace_back(fa, l);
+                ++flow(fa, l);
                 int temp = fa;
                 fa = from[fa];
                 from[temp] = -1;
@@ -180,7 +191,7 @@ void layout() {
         }
 
         std::vector<std::pair<int,int>> res = search(die_s, dies_l);
-        // TODO: decrease edge weight
+        // TODO: output the result
     }
 
     return;
