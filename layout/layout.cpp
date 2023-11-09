@@ -16,6 +16,10 @@ int sqrt(int x) {
 
 std::vector<int> get_network(const std::string filename) {
     std::ifstream network_fs(filename);
+    if(!network_fs.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        exit(1);
+    }
 
     std::vector<int> mat;
     int x;
@@ -27,23 +31,29 @@ std::vector<int> get_network(const std::string filename) {
     return mat;
 }
 
+bool is_digit(char c) {
+    return c <= '9' && c >= '0';
+}
+
 int str_to_int(const std::string &s, int l, int r) {
     int res = 0;
     for(int i = l; i < r; ++i) {
+        assert(is_digit(s[i]));
         res = (res << 3) + (res << 1);
         res += s[i] - '0';
     }
     return res;
 }
 
-bool is_digit(char c) {
-    return c <= '9' && c >= '0';
-}
-
 Trie<int> get_node_die_table(const std::string filename) {
     // make node-to-die mapping table with Trie
     Trie<int> trie;
     std::ifstream node_fs(filename);
+    if(!node_fs.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        exit(1);
+    }
+
     std::string buffer;
     while(std::getline(node_fs, buffer)) {
         while(buffer.back() == '\r' || buffer.back() == ' ' || buffer.back() == '\n') buffer.pop_back();
@@ -66,14 +76,20 @@ Trie<int> get_node_die_table(const std::string filename) {
             trie.add(buffer, l, r, die_index);
         }
     }
+
     node_fs.close();
     return trie;
 }
 
-Trie<int> get_die_FPGA_table(const std::string filename) {
-    // make die-to-FPGA mapping table with Trie
-    Trie<int> trie;
+std::vector<int> get_die_FPGA_table(const std::string filename) {
+    // make die-to-FPGA mapping table with std::vector<int>
+    std::vector<int> res;
     std::ifstream die_fs(filename);
+    if(!die_fs.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        exit(1);
+    }
+
     std::string buffer;
     while(std::getline(die_fs, buffer)) {
         while(buffer.back() == '\r' || buffer.back() == ' ' || buffer.back() == '\n') buffer.pop_back();
@@ -96,17 +112,19 @@ Trie<int> get_die_FPGA_table(const std::string filename) {
 
             assert(r - l > 3);
             assert(buffer[l] == 'D' && buffer[l + 1] == 'i' && buffer[l + 2] == 'e');
-            trie.add(buffer, l + 3, r, FPGA_index); // auto skip "Die"
+            int die_index = str_to_int(buffer, l + 3, r);
+            if(die_index >= (int)res.size()) res.resize(die_index + 1);
+            res[die_index] = FPGA_index;
         }
     }
     die_fs.close();
-    return trie;
+    return res;
 }
 
 std::string filename_prefix() {
     std::string input_id = "1";
     // std::cin >> input_id;
-    const std::string prefix = "./TestCase20230927/testcase";
+    const std::string prefix = "./TestCase20231027/testcase";
     const std::string suffix = "/design.";
     return prefix + input_id + suffix;
 }
@@ -132,7 +150,7 @@ void layout() {
     };
 
     Trie<int> gs = get_node_die_table(filename_prefix() + "die.position");
-    Trie<int> dies = get_die_FPGA_table(filename_prefix() + "fpga.die"); // auto skip "Die" with assertions
+    std::vector<int> dies = get_die_FPGA_table(filename_prefix() + "fpga.die"); // auto skip "Die" with assertions
 
     auto search = [&](int die_s, const std::vector<int> &dies_l) {
         struct Elem {
@@ -160,7 +178,7 @@ void layout() {
         for(int l : dies_l) {
             for(int fa = from[l]; fa != -1;) {
                 edges.emplace_back(fa, l);
-                ++flow(fa, l);
+                if(dies[fa] == dies[l]) ++flow(fa, l);
                 int temp = fa;
                 fa = from[fa];
                 from[temp] = -1;
@@ -170,21 +188,33 @@ void layout() {
         return edges;
     };
 
+    int line = 0, net_id;
+    char sl, temp;
+    std::string node;
+    std::string filename = filename_prefix() + "net";
+    std::ifstream net_fs(filename);
+    if(!net_fs.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        exit(1);
+    }
+
+    net_fs >> node >> sl >> temp;
+    ++line;
+    std::ofstream network_out(filename_prefix() + "route.out");
+
     while(true) {
-        std::ifstream net_fs(filename_prefix() + "net");
-
-        std::string node;
-        char sl, temp;
-
-        net_fs >> node >> sl >> temp;
+        net_id = line;
         assert(net_fs && sl == 's'); // check if file is empty and the first is 's'
         int die_s = gs.query(node);
         std::vector<int> dies_l;
 
         while(true) {
             net_fs >> node >> sl;
-            if(!net_fs || sl == 's') {
+            ++line;
+            if(sl == 's') {
                 net_fs >> temp;
+                break;
+            }else if(!net_fs) {
                 break;
             }
             dies_l.emplace_back(gs.query(node));
@@ -192,7 +222,10 @@ void layout() {
 
         std::vector<std::pair<int,int>> res = search(die_s, dies_l);
         // TODO: output the result
+        std::cout << net_id << '\n';
     }
+
+    net_fs.close();
 
     return;
 }

@@ -8,6 +8,7 @@
 #include <queue>
 #include <map>
 #include <string>
+#include "easy_vector_pair_output.h"
 
 void layout();
 int sqrt(int);
