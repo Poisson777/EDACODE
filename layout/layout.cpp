@@ -17,7 +17,7 @@ int sqrt(int x) {
 std::vector<int> get_network(const std::string filename) {
     std::ifstream network_fs(filename);
     if(!network_fs.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        std::cerr << "Error: Cannot open file " << filename << "\n";
         exit(1);
     }
 
@@ -50,7 +50,7 @@ Trie<int> get_node_die_table(const std::string filename) {
     Trie<int> trie;
     std::ifstream node_fs(filename);
     if(!node_fs.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        std::cerr << "Error: Cannot open file " << filename << "\n";
         exit(1);
     }
 
@@ -86,7 +86,7 @@ std::vector<int> get_die_FPGA_table(const std::string filename) {
     std::vector<int> res;
     std::ifstream die_fs(filename);
     if(!die_fs.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        std::cerr << "Error: Cannot open file " << filename << "\n";
         exit(1);
     }
 
@@ -121,17 +121,16 @@ std::vector<int> get_die_FPGA_table(const std::string filename) {
     return res;
 }
 
-std::string filename_prefix() {
-    std::string input_id = "2";
+std::string filename_prefix(std::string input_id) {
     // std::cin >> input_id;
     const std::string prefix = "./TestCase20231027/testcase";
     const std::string suffix = "/design.";
     return prefix + input_id + suffix;
 }
 
-void layout() {
+void layout(std::string testcase) {
     std::vector<int> adj;
-    get_network(filename_prefix() + "die.network").swap(adj);
+    get_network(filename_prefix(testcase) + "die.network").swap(adj);
     
     int n = sqrt(adj.size());
 
@@ -149,8 +148,8 @@ void layout() {
         return adj[x * n + y];
     };
 
-    Trie<int> gs = get_node_die_table(filename_prefix() + "die.position");
-    std::vector<int> dies = get_die_FPGA_table(filename_prefix() + "fpga.die"); // auto skip "Die" with assertions
+    Trie<int> gs = get_node_die_table(filename_prefix(testcase) + "die.position");
+    std::vector<int> dies = get_die_FPGA_table(filename_prefix(testcase) + "fpga.die"); // auto skip "Die" with assertions
 
     auto search = [&](int die_s, const std::vector<int> &dies_l) {
         struct Elem {
@@ -201,16 +200,15 @@ void layout() {
     int line = 0, net_id;
     char sl, temp;
     std::string node;
-    std::string filename = filename_prefix() + "net";
+    std::string filename = filename_prefix(testcase) + "net";
     std::ifstream net_fs(filename);
     if(!net_fs.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << ".\n";
+        std::cerr << "Error: Cannot open file " << filename << "\n";
         exit(1);
     }
 
     net_fs >> node >> sl >> temp;
     ++line;
-    std::ofstream network_out(filename_prefix() + "route.out");
 
     bool loop = true;
     while(loop) {

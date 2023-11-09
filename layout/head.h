@@ -10,7 +10,7 @@
 #include <string>
 #include "easy_vector_pair_output.h"
 
-void layout();
+void layout(std::string testcase);
 int sqrt(int);
 template<class _Ty>
 class Trie {
