@@ -7,7 +7,7 @@ std::ostream& operator <<(std::ostream& out, const std::pair<A, B> &p) {
 template<class A>
 std::ostream& operator <<(std::ostream& out, const std::vector<A> &v) {
     out << "[";
-    for(int i=0;i<v.size();++i) {
+    for(int i = 0; i < (int)v.size(); ++i) {
         if(i) out << ", ";
         out << v[i];
     }

@@ -122,7 +122,7 @@ std::vector<int> get_die_FPGA_table(const std::string filename) {
 }
 
 std::string filename_prefix() {
-    std::string input_id = "1";
+    std::string input_id = "2";
     // std::cin >> input_id;
     const std::string prefix = "./TestCase20231027/testcase";
     const std::string suffix = "/design.";
@@ -136,14 +136,14 @@ void layout() {
     int n = sqrt(adj.size());
 
     // get the flow of edges, read-n-write, directly modify the reference variable
-    auto flow = [&adj, &n](int x, int y) -> int& {
+    auto left_flow = [&](int x, int y) -> int& {
         // assert(x != y);
         if(x < y) std::swap(x, y);
         return adj[x * n + y];
     };
 
     // get the weight of edges, read-only
-    auto weight = [&adj, &n](int x, int y) -> int {
+    auto weight = [&](int x, int y) -> int {
         // assert(x != y);
         if(x > y) std::swap(x, y);
         return adj[x * n + y];
@@ -160,28 +160,38 @@ void layout() {
 
         std::queue<Elem> q;
         std::vector<int> from(n), vis(n);
+        for(int e : dies_l) {
+            vis[e] = 1;
+        }
+
         q.emplace(die_s, -1, 0);
+        int total = 0;
         while(!q.empty()) {
             auto [v, fa, dist] = q.front();
             q.pop();
 
-            if(vis[v]) continue;
+            if(vis[v] == -1) continue;
 
+            total += vis[v];
+            vis[v] = -1;
             from[v] = fa;
 
-            for(int to = 0; to < n; ++to) if(weight(v, to) < flow(v, to) && to != v && !vis[to]) {
-                q.emplace(to, v, dist + 1);
+            if((size_t)total == dies_l.size()) break;
+
+            for(int to = 0; to < n; ++to) {
+                // std::cout << "v = " << v << ", to = " << to << ", left_flow(" << v << ", " << to << ") = " << left_flow(v, to) << '\n';
+                if(vis[to] != -1 && left_flow(v, to) > 0 /* && to != v */) {
+                    q.emplace(to, v, dist + 1);
+                }
             }
         }
 
         std::vector<std::pair<int,int>> edges;
         for(int l : dies_l) {
-            for(int fa = from[l]; fa != -1;) {
-                edges.emplace_back(fa, l);
-                if(dies[fa] == dies[l]) ++flow(fa, l);
-                int temp = fa;
-                fa = from[fa];
-                from[temp] = -1;
+            for(int now = l, fa = from[l]; fa != -1; now = fa, fa = from[now]) {
+                if(dies[now] == dies[fa]) --left_flow(now, fa);
+                edges.emplace_back(fa, now);
+                from[now] = -1;
             }
         }
 
@@ -202,7 +212,8 @@ void layout() {
     ++line;
     std::ofstream network_out(filename_prefix() + "route.out");
 
-    while(true) {
+    bool loop = true;
+    while(loop) {
         net_id = line;
         assert(net_fs && sl == 's'); // check if file is empty and the first is 's'
         int die_s = gs.query(node);
@@ -215,6 +226,7 @@ void layout() {
                 net_fs >> temp;
                 break;
             }else if(!net_fs) {
+                loop = false;
                 break;
             }
             dies_l.emplace_back(gs.query(node));
@@ -223,6 +235,8 @@ void layout() {
         std::vector<std::pair<int,int>> res = search(die_s, dies_l);
         // TODO: output the result
         std::cout << net_id << '\n';
+        std::cout << "adjecent matrix = " << adj << '\n';
+        std::cout << "result = " << res << '\n';
     }
 
     net_fs.close();
