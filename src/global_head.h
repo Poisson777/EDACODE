@@ -14,11 +14,25 @@
 #include <iostream>
 #include <fstream>
 
+#include "class/RoutingGraph.tpp";
+
 struct GetNetworkReturn{
     RoutingGraph routing_graph;
-    std::vector<Edge> edges;
-    std::vector<Net> nets;
-    std::vector<Die> dies;
-    std::vector<FPGA> FPGAs;
+    Net *nets;
+    Edge *edges;
+    Die *dies;
+    FPGA *fpgas;
+    GetNetworkReturn(int net_count, int edge_count, int die_count, int fpga_count) {
+        nets = new Net[net_count];
+        edges = new Edge[edge_count];
+        dies = new Die[die_count];
+        fpgas = new FPGA[fpga_count];
+    }
+    ~GetNetworkReturn() {
+        delete[] nets;
+        delete[] edges;
+        delete[] dies;
+        delete[] fpgas;
+    }
 };
 #endif
