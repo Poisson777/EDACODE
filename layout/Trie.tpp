@@ -1,3 +1,5 @@
+#ifndef _TRIE_TPP_
+#define _TRIE_TPP_
 #include "head.h"
 
 template<class _Ty>
@@ -51,4 +53,4 @@ _Ty Trie<_Ty>::query(const std::string &s, int l, int r) {
     }
     return node[now].belonging;
 }
-
+#endif

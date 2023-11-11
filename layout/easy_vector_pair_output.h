@@ -1,3 +1,5 @@
+#ifndef _EASY_VECTOR_PAIR_OUTPUT_H_
+#define _EASY_VECTOR_PAIR_OUTPUT_H_
 #include <iostream>
 #include <vector>
 template<class A, class B>
@@ -13,3 +15,4 @@ std::ostream& operator <<(std::ostream& out, const std::vector<A> &v) {
     }
     return out << "]";
 }
+#endif
