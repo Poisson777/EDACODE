@@ -9,10 +9,11 @@
 class RoutingGraph {
 private:
 public:
-    std::vector<Net> nets;
-    std::vector<Edge> edges;
-    std::vector<Node> nodes;
-    std::vector<Die> dies;
+    std::vector<Net*> nets;
+    std::vector<Edge*> edges;
+    std::vector<Node*> nodes;
+    std::vector<Die*> dies;
+    RoutingGraph() : nets(), edges(), nodes(), dies() {}
 };
 
 #endif
