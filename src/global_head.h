@@ -13,4 +13,12 @@
 #include <unordered_set>
 #include <iostream>
 #include <fstream>
+
+struct GetNetworkReturn{
+    RoutingGraph routing_graph;
+    std::vector<Edge> edges;
+    std::vector<Net> nets;
+    std::vector<Die> dies;
+    std::vector<FPGA> FPGAs;
+};
 #endif

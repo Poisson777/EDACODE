@@ -1,3 +1,5 @@
+#ifndef _TDMDATA_CPP_
+#define _TDMDATA_CPP_
 #include "global.h"
 
 class FPGA;
@@ -283,4 +285,4 @@ public:
         }
     }
 };
-
+#endif

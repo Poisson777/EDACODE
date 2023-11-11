@@ -81,9 +81,11 @@ Trie<int> get_node_die_table(const std::string filename) {
     return trie;
 }
 
-std::vector<int> get_die_FPGA_table(const std::string filename) {
+std::pair<int, std::vector<int>> get_die_FPGA_table(const std::string filename) {
     // make die-to-FPGA mapping table with std::vector<int>
-    std::vector<int> res;
+    std::pair<int, std::vector<int>> ret;
+    auto &[n, res] = ret;
+    n = 0;
     std::ifstream die_fs(filename);
     if(!die_fs.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << "\n";
@@ -92,6 +94,7 @@ std::vector<int> get_die_FPGA_table(const std::string filename) {
 
     std::string buffer;
     while(std::getline(die_fs, buffer)) {
+        ++n;
         while(buffer.back() == '\r' || buffer.back() == ' ' || buffer.back() == '\n') buffer.pop_back();
         assert(buffer[0] == 'F' && buffer[1] == 'P' && buffer[2] == 'G' && buffer[3] == 'A');
         int l = 4, r = 4, n = buffer.size();
@@ -118,7 +121,7 @@ std::vector<int> get_die_FPGA_table(const std::string filename) {
         }
     }
     die_fs.close();
-    return res;
+    return ret;
 }
 
 std::string filename_prefix(std::string input_id) {
@@ -128,7 +131,7 @@ std::string filename_prefix(std::string input_id) {
     return prefix + input_id + suffix;
 }
 
-void layout(std::string testcase) {
+LayoutReturn layout(std::string testcase) {
     std::vector<int> adj;
     get_network(filename_prefix(testcase) + "die.network").swap(adj);
     
@@ -149,7 +152,10 @@ void layout(std::string testcase) {
     };
 
     Trie<int> gs = get_node_die_table(filename_prefix(testcase) + "die.position");
-    std::vector<int> dies = get_die_FPGA_table(filename_prefix(testcase) + "fpga.die"); // auto skip "Die" with assertions
+    int FPGA_count;
+    std::vector<int> dies;
+    std::tie(FPGA_count, dies) = get_die_FPGA_table(filename_prefix(testcase) + "fpga.die");
+    // auto [FPGA_count, dies] = get_die_FPGA_table(filename_prefix(testcase) + "fpga.die"); // avaible in c++20
 
     auto search = [&](int die_s, const std::vector<int> &dies_l) {
         struct Elem {
@@ -209,6 +215,7 @@ void layout(std::string testcase) {
 
     net_fs >> node >> sl >> temp;
     ++line;
+    std::vector<std::pair<int,std::vector<std::pair<int,int>>>> networks;
 
     bool loop = true;
     while(loop) {
@@ -230,14 +237,20 @@ void layout(std::string testcase) {
             dies_l.emplace_back(gs.query(node));
         }
 
-        std::vector<std::pair<int,int>> res = search(die_s, dies_l);
-        // TODO: output the result
-        std::cout << net_id << '\n';
-        std::cout << "adjecent matrix = " << adj << '\n';
-        std::cout << "result = " << res << '\n';
+        std::vector<std::pair<int,int>> network = search(die_s, dies_l);
+        networks.emplace_back(net_id, network);
+        // std::cout << net_id << '\n';
+        // std::cout << "adjecent matrix = " << adj << '\n';
+        // std::cout << "result = " << network << '\n';
     }
 
     net_fs.close();
 
-    return;
+    LayoutReturn layout_return;
+    layout_return.die_count = n;
+    layout_return.FPGA_count = FPGA_count;
+    layout_return.networks.swap(networks);
+    layout_return.adjacent.swap(adj);
+
+    return layout_return;
 }

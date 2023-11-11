@@ -10,7 +10,15 @@
 #include <string>
 #include "easy_vector_pair_output.h"
 
-void layout(std::string testcase);
+struct LayoutReturn {
+    int die_count;
+    int FPGA_count;
+    std::vector<int> adjacent;
+    std::vector<int> die_to_FPGA;
+    std::vector<std::pair<int, std::vector<std::pair<int,int>>>> networks;
+};
+
+LayoutReturn layout(std::string testcase);
 int sqrt(int);
 template<class _Ty>
 class Trie {
