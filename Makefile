@@ -5,8 +5,8 @@ TARGET = a.out
 TEST_TARGET = test.out
 
 
-SAME_SOURCES = layout.cpp\
-	get_networks.cpp\
+SAME_SOURCES = layout/layout.cpp\
+	layout/get_networks.cpp\
 
 # List of source files
 SOURCES = $(SAME_SOURCES)\
