@@ -16,6 +16,8 @@ struct LayoutReturn {
         int src_die;
         std::vector<int> sink_die;
         std::vector<std::pair<int,int>> edges;
+        NetAttr(int net_id, int src_die, std::vector<int> sink_die, std::vector<std::pair<int,int>> edges) : 
+            net_id(net_id), src_die(src_die), sink_die(sink_die), edges(edges) {}
     };
     std::vector<NetAttr> networks;
 /*  vector<                              // networks
