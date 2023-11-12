@@ -10,6 +10,7 @@ public:
     Net *net;
     Die *fromDie, *toDie;
     Edge() : net(), fromDie(), toDie() {}
+    Edge(Net *net, Die *fromDie, Die *toDie) : net(net), fromDie(fromDie), toDie(toDie) {}
 };
 
 #endif
