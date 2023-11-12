@@ -4,6 +4,8 @@
 #include <vector>
 #include "Die.tpp"
 
+class Die;
+
 class FPGA {
 private:
 public:

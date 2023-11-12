@@ -4,6 +4,8 @@
 #include "Net.tpp"
 #include "Die.tpp"
 
+class Net;
+
 class Edge {
 private:
 public:

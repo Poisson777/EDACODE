@@ -1,11 +1,10 @@
 #include "LayoutReturn.h"
-#include "global_head.h"
 #include "../class/all.h"
+#include <algorithm>
 
-template<typename _Ty>
-void push_back(_Ty *a, int &cur, _Ty e) {
-    a[cur++] = e;
-}
+#include "GetNetworkReturn.h"
+
+namespace Layout {
 
 GetNetworkReturn get_network(std::string testcase) {
     // return a GetNetworkReturn instance
@@ -71,4 +70,6 @@ GetNetworkReturn get_network(std::string testcase) {
     routingGraph.nodes.erase(std::unique(routingGraph.nodes.begin(), routingGraph.nodes.end()), routingGraph.nodes.end());
 
     return res;
+}
+
 }

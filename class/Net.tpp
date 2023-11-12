@@ -5,6 +5,8 @@
 #include "Edge.tpp"
 #include "Node.tpp"
 
+class Edge;
+
 class Net {
 private:
 public:

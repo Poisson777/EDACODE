@@ -1,12 +1,12 @@
 CC = g++
-FLAGS = -Wall -g
+FLAGS = -Wall -g -std=c++20
 
 TARGET = a.out
 TEST_TARGET = test.out
 
 
 SAME_SOURCES = layout.cpp\
-	# get_networks.cpp\
+	get_networks.cpp\
 
 # List of source files
 SOURCES = $(SAME_SOURCES)\

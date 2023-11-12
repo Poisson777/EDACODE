@@ -31,6 +31,7 @@ struct LayoutReturn {
         >
     > */
 };
+
 LayoutReturn layout(std::string testcase);
 
 #endif

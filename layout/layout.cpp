@@ -249,6 +249,7 @@ LayoutReturn layout(std::string testcase) {
     LayoutReturn layout_return;
     layout_return.die_count = n;
     layout_return.FPGA_count = FPGA_count;
+    layout_return.die_to_FPGA.swap(dies);
     layout_return.networks.swap(networks);
     layout_return.adjacent.swap(adj);
 

@@ -3,6 +3,8 @@
 
 #include "FPGA.tpp"
 
+class FPGA;
+
 class Die {
 private:
 public:
