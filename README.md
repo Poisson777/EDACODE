@@ -19,18 +19,3 @@ void your_func() {
 //    |~~ see ./layout/GetNetworkReturn.h for details
 }
 ```
-
-## Testcase usage
-
-```
-#include "layout/GetNetworkReturn.h"
-#include "layout/GetNetworkReturnTest.h"
-
-void func() {
-    GetNetworkReturn ret = GetNetwork();
-    if (ret.is_success) {
-        // do something
-    }
-}
-
-```
