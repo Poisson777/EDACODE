@@ -215,7 +215,7 @@ LayoutReturn layout(std::string testcase) {
 
     net_fs >> node >> sl >> temp;
     ++line;
-    std::vector<std::pair<int,std::vector<std::pair<int,int>>>> networks;
+    std::vector<LayoutReturn::NetAttr> networks;
 
     bool loop = true;
     while(loop) {
@@ -238,7 +238,7 @@ LayoutReturn layout(std::string testcase) {
         }
 
         std::vector<std::pair<int,int>> network = search(die_s, dies_l);
-        networks.emplace_back(net_id, network);
+        networks.emplace_back(net_id, die_s, dies_l, network);
         // std::cout << net_id << '\n';
         // std::cout << "adjecent matrix = " << adj << '\n';
         // std::cout << "result = " << network << '\n';

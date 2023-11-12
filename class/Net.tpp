@@ -11,8 +11,8 @@ public:
     int netId;
     std::vector<Edge*> edges;
     Node *sourceNode;
-    std::vector<Node*> sinkNode;
-    Net() : edges(), sourceNode(), sinkNode() {}
+    std::vector<Node*> sinkNodes;
+    Net() : edges(), sourceNode(), sinkNodes() {}
 };
 
 #endif

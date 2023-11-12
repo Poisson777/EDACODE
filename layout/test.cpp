@@ -1,6 +1,8 @@
 // temporary test .cpp file
 #include "head.h"
 
+extern int sqrt(int);
+
 int main() {
     assert(sqrt(16384) == 128);
     std::cout << "sqrt() test passed.\n";
@@ -14,5 +16,5 @@ int main() {
     assert(trie.query(s1) == 0);
     std::cout << "Trie class test passed.\n";
 
-    // layout();
+    layout("2");
 }

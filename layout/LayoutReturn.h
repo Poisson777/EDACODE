@@ -11,9 +11,18 @@ struct LayoutReturn {
     // usage: adjacent[i * die_count + j]
     std::vector<int> die_to_FPGA; // die_index -> FPGA_index
     // usage: die_to_FPGA[die_index]
-    std::vector<std::pair<int, std::vector<std::pair<int,int>>>> networks;
+    struct NetAttr{
+        int net_id;
+        int src_die;
+        std::vector<int> sink_die;
+        std::vector<std::pair<int,int>> edges;
+    };
+    std::vector<NetAttr> networks;
 /*  vector<                              // networks
-        pair< network_id,                // network < net_id, edges >
+        NetAttr<                         // network
+            net_id,                      // network's id
+            src_die,                     // source die node
+            vector< sink_die >,          // sink die nodes
             vector<                      // edges
                 pair< from_die, to_die > // edge
             >
