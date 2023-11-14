@@ -200,6 +200,13 @@ LayoutReturn layout(std::string testcase) {
             }
         }
 
+        for(int l : dies_l) {
+            if(l == die_s) {
+                edges.emplace_back(l, die_s);
+                break;
+            }
+        }
+
         return edges;
     };
 
