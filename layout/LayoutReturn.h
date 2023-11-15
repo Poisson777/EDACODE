@@ -8,6 +8,7 @@ struct LayoutReturn {
     int die_count;
     int FPGA_count;
     std::vector<int> adjacent; // adjacent matrix
+    std::vector<int> adjacent2;
     // usage: adjacent[i * die_count + j]
     std::vector<int> die_to_FPGA; // die_index -> FPGA_index
     // usage: die_to_FPGA[die_index]

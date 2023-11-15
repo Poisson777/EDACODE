@@ -12,6 +12,7 @@ struct GetNetworkReturn{
     Die *dies;
     FPGA *fpgas;
     Node *nodes;
+    std::vector<int> adj;
     GetNetworkReturn(int net_count, int edge_count, int die_count, int fpga_count) {
         nets = new Net[net_count];
         edges = new Edge[edge_count];
@@ -20,11 +21,12 @@ struct GetNetworkReturn{
         nodes = new Node[die_count];
     }
     ~GetNetworkReturn() {
-        delete[] nets;
-        delete[] edges;
-        delete[] dies;
-        delete[] fpgas;
-        delete[] nodes;
+//        delete[] nets;
+//        delete[] edges;
+//        delete[] dies;
+//        delete[] fpgas;
+//        delete[] nodes;
+
     }
 };
 

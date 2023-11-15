@@ -1,6 +1,7 @@
 #include "LayoutReturn.h"
 #include "../class/all.h"
 #include <algorithm>
+#include <iostream>
 
 #include "GetNetworkReturn.h"
 
@@ -9,15 +10,18 @@ namespace Layout {
 GetNetworkReturn get_network(std::string testcase) {
     // return a GetNetworkReturn instance
     // get_network("2");
-    auto [die_count, FPGA_count, adjacent, die_to_FPGA, networks] = layout(testcase);
+    auto [die_count, FPGA_count, adjacent, adjacent2,die_to_FPGA, networks] = layout(testcase);
     int net_count = networks.size(), edge_count = 0;
     for(auto &[net_id, die_s, dies_l, network] : networks) {
         edge_count += network.size();
     }
-
     GetNetworkReturn res(net_count, edge_count, die_count, FPGA_count);
-    auto &[routingGraph, nets, edges, dies, fpgas, nodes] = res;
-    
+    auto &[routingGraph, nets, edges, dies, fpgas, nodes,adj] = res;
+    for(auto a:adjacent2) adj.push_back(a);
+
+
+
+
     int edges_cur = 0;
 
     for(int i = 0; i < die_count; ++i) {

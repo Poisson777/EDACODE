@@ -133,8 +133,9 @@ std::string filename_prefix(std::string input_id) {
 
 LayoutReturn layout(std::string testcase) {
     std::vector<int> adj;
+    std::vector<int> adj2;
     get_network(filename_prefix(testcase) + "die.network").swap(adj);
-    
+    for(int i=0;i<adj.size();i++) adj2.push_back(adj[i]);
     int n = sqrt(adj.size());
 
     // get the flow of edges, read-n-write, directly modify the reference variable
@@ -191,24 +192,12 @@ LayoutReturn layout(std::string testcase) {
             }
         }
 
-        if(!q.empty() && (size_t)total < dies_l.size()) {
-            std::cerr << "No solution\n";
-            exit(2);
-        }
-
         std::vector<std::pair<int,int>> edges;
         for(int l : dies_l) {
             for(int now = l, fa = from[l]; fa != -1; now = fa, fa = from[now]) {
                 if(dies[now] == dies[fa]) --left_flow(now, fa);
                 edges.emplace_back(fa, now);
                 from[now] = -1;
-            }
-        }
-
-        for(int l : dies_l) {
-            if(l == die_s) {
-                edges.emplace_back(l, die_s);
-                break;
             }
         }
 
@@ -264,6 +253,6 @@ LayoutReturn layout(std::string testcase) {
     layout_return.die_to_FPGA.swap(dies);
     layout_return.networks.swap(networks);
     layout_return.adjacent.swap(adj);
-
+    layout_return.adjacent2.swap(adj2);
     return layout_return;
 }
