@@ -17,6 +17,6 @@ int main() {
     assert(trie.query(s1) == 0);
     std::cout << "Trie class test passed.\n";
 
-    auto res = Layout::get_network("2");
+    auto res = Layout::get_network("10");
     std::cout << "Layout::get_network() test passed.\n";
 }

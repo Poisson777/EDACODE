@@ -191,6 +191,11 @@ LayoutReturn layout(std::string testcase) {
             }
         }
 
+        if(!q.empty() && (size_t)total < dies_l.size()) {
+            std::cerr << "No solution\n";
+            exit(2);
+        }
+
         std::vector<std::pair<int,int>> edges;
         for(int l : dies_l) {
             for(int now = l, fa = from[l]; fa != -1; now = fa, fa = from[now]) {
